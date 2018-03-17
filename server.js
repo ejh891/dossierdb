@@ -38,7 +38,12 @@ app.post('/api/v1/persons',
         const createdPerson = await new PersonModel(person).save();
 
         res.status(201); // created
-        res.json({ created: true, person: createdPerson });
+        res.json({ 
+            created: true,
+            data: {
+                person: createdPerson 
+            }
+        });
     })
 );
 
@@ -78,7 +83,12 @@ app.put('/api/v1/persons/:id',
                 throw boom.notFound(`Person with id: ${id} was not found`);
             }
 
-            res.json({ updated: true, person: updatedPerson });
+            res.json({ 
+                updated: true,
+                data: {
+                    person: updatedPerson 
+                }
+            });
             return;
         } catch (error) {
             if (error instanceof mongoose.CastError) {
@@ -102,7 +112,12 @@ app.delete('/api/v1/persons/:id',
                 throw boom.notFound(`Person with id: ${id} was not found`);
             }
 
-            res.json({ deleted: true, deletedPerson });
+            res.json({
+                deleted: true,
+                data: {
+                    person: deletedPerson
+                }
+            });
             return;
         } catch (error) {
             if (error instanceof mongoose.CastError) {
@@ -125,7 +140,12 @@ app.post('/api/v1/records',
         const createdRecord = await new RecordModel(record).save();
 
         res.status(201); // created
-        res.json({ created: true, record: createdRecord });
+        res.json({
+            created: true,
+            data: {
+                record: createdRecord 
+            }
+        });
     })
 );
 
@@ -159,7 +179,12 @@ app.delete('/api/v1/records/:id',
                 throw boom.notFound(`Record with id: ${id} was not found`);
             }
 
-            res.json({ deleted: true, deletedRecord });
+            res.json({ 
+                deleted: true,
+                data: {
+                    record: deletedRecord
+                }
+            });
             return;
         } catch (error) {
             if (error instanceof mongoose.CastError) {
