@@ -51,6 +51,10 @@ app.get('/api/v1/persons',
   addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
   handleAsyncErrors(async (req, res) => {
     const persons = await PersonModel.find({}).lean();
+    
+    for (const person of persons) {
+      person.records = await RecordModel.find({ personId: person._id }).lean();
+    }
 
     res.json({
       data: {
@@ -66,6 +70,7 @@ app.get('/api/v1/persons/:id',
     const id = req.params.id;
 
     const person = await PersonModel.findOne({ _id: id }).lean();
+    person.records = await RecordModel.find({ personId: person._id }).lean();
 
     res.json({
       data: {
