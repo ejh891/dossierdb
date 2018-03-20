@@ -17,7 +17,18 @@ const RecordSchema = new mongoose.Schema({
     },
     path: {
         type: String,
-        default: '/'
+        default: '/',
+        lowercase: true,
+        validate: {
+            validator: (value) => {
+              return (
+                  value.indexOf(' ') === -1 &&
+                  value.startsWith('/') &&
+                  value.endsWith('/')
+              );
+            },
+            message: '{VALUE} must not have spaces'
+          },
     },
 });
 
