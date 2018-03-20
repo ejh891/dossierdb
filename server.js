@@ -48,7 +48,7 @@ app.post('/api/v1/persons',
 );
 
 app.get('/api/v1/persons',
-  addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
+  // addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
   handleAsyncErrors(async (req, res) => {
     const persons = await PersonModel.find({}).lean();
     
@@ -65,7 +65,7 @@ app.get('/api/v1/persons',
 );
 
 app.get('/api/v1/persons/:id',
-  addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
+  // addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
   handleAsyncErrors(async (req, res) => {
     const id = req.params.id;
 
@@ -163,7 +163,7 @@ app.post('/api/v1/records',
 );
 
 app.get('/api/v1/records',
-  addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
+  // addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
   handleAsyncErrors(async (req, res) => {
     const {
       personId

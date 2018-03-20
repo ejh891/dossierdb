@@ -14,7 +14,11 @@ const RecordSchema = new mongoose.Schema({
         type: String,
         required: true,
         index: true,
-    }
+    },
+    path: {
+        type: String,
+        default: '/'
+    },
 });
 
 // mongoose Model
