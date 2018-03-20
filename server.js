@@ -10,8 +10,8 @@ const cors = require('cors');
 const addCacheHeaders = require('./middleware/addCacheHeaders');
 const handleAsyncErrors = require('./middleware/handleAsyncErrors');
 
-const PersonModel = require('./database/models/persons');
-const RecordModel = require('./database/models/records');
+const PersonCollection = require('./database/collections/personCollection');
+const RecordCollection = require('./database/collections/recordCollection');
 
 const env = require('./environment/env');
 const port = env.PORT;
@@ -35,7 +35,7 @@ app.post('/api/v1/persons',
   handleAsyncErrors(async (req, res) => {
     const person = req.body.data.person;
 
-    const createdPerson = await new PersonModel(person).save();
+    const createdPerson = await PersonCollection.add(person);
 
     res.status(201); // created
     res.json({
@@ -50,11 +50,7 @@ app.post('/api/v1/persons',
 app.get('/api/v1/persons',
   // addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
   handleAsyncErrors(async (req, res) => {
-    const persons = await PersonModel.find({}).lean();
-    
-    for (const person of persons) {
-      person.records = await RecordModel.find({ personId: person._id }).lean();
-    }
+    const persons = await PersonCollection.browse();
 
     res.json({
       data: {
@@ -69,8 +65,7 @@ app.get('/api/v1/persons/:id',
   handleAsyncErrors(async (req, res) => {
     const id = req.params.id;
 
-    const person = await PersonModel.findOne({ _id: id }).lean();
-    person.records = await RecordModel.find({ personId: person._id }).lean();
+    const person = await PersonCollection.read(id);    
 
     res.json({
       data: {
@@ -86,11 +81,7 @@ app.put('/api/v1/persons/:id',
     const person = req.body.data.person;
 
     try {
-      const updatedPerson = await PersonModel.findOneAndUpdate(
-        { _id: id },
-        person,
-        { new: true } // return the updated doc instead of the original doc
-      );
+      const updatedPerson = await PersonCollection.edit(id, person);
 
       if (updatedPerson === null) {
         throw boom.notFound(`Person with id: ${id} was not found`);
@@ -119,10 +110,14 @@ app.delete('/api/v1/persons/:id',
     const id = req.params.id;
 
     try {
-      const deletedPerson = await PersonModel.findOneAndRemove({ _id: id });
+      const deletedPerson = await PersonCollection.delete(id);
 
       if (deletedPerson === null) {
         throw boom.notFound(`Person with id: ${id} was not found`);
+      }
+
+      for (const record of deletedPerson.records) {
+        await RecordCollection.delete(record._id);
       }
 
       res.json({
@@ -150,7 +145,7 @@ app.post('/api/v1/records',
   handleAsyncErrors(async (req, res) => {
     const record = req.body.data.record;
 
-    const createdRecord = await new RecordModel(record).save();
+    const createdRecord = await RecordCollection.add(record);
 
     res.status(201); // created
     res.json({
@@ -165,17 +160,7 @@ app.post('/api/v1/records',
 app.get('/api/v1/records',
   // addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
   handleAsyncErrors(async (req, res) => {
-    const {
-      personId
-    } = req.query;
-
-    const query = RecordModel.find().lean();
-
-    if (personId) {
-      query.where('personId').equals(personId);
-    }
-
-    const records = await query.exec();
+    const records = await RecordCollection.browse(req.query);
 
     res.json({
       data: records
@@ -188,7 +173,7 @@ app.delete('/api/v1/records/:id',
     const id = req.params.id;
 
     try {
-      const deletedRecord = await RecordModel.findOneAndRemove({ _id: id });
+      const deletedRecord = await RecordCollection.delete(id);
 
       if (deletedRecord === null) {
         throw boom.notFound(`Record with id: ${id} was not found`);
