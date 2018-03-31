@@ -2,13 +2,17 @@ const mongoose = require('mongoose');
 
 // mongoose Schema
 const RecordSchema = new mongoose.Schema({
-    key: { 
+    title: { 
         type: String,
         required: true,
     },
-    value: {
+    notes: {
         type: String,
-        required: true,
+        required: false,
+    },
+    imageURL: {
+        type: String,
+        required: false,
     },
     personId: {
         type: String,
@@ -27,7 +31,7 @@ const RecordSchema = new mongoose.Schema({
                   value.endsWith('/')
               );
             },
-            message: '{VALUE} must not have spaces'
+            message: '{VALUE} must not have spaces and must start/end with a slash'
           },
     },
 });
