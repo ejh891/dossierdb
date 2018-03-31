@@ -168,6 +168,36 @@ app.get('/api/v1/records',
   })
 );
 
+app.put('/api/v1/records/:id',
+  handleAsyncErrors(async (req, res) => {
+    const id = req.params.id;
+    const record = req.body.data.record;
+
+    try {
+      const updatedRecord = await RecordCollection.edit(id, record);
+
+      if (updatedRecord === null) {
+        throw boom.notFound(`Record with id: ${id} was not found`);
+      }
+
+      res.json({
+        updated: true,
+        data: {
+          record: updatedRecord
+        }
+      });
+      return;
+    } catch (error) {
+      if (error instanceof mongoose.CastError) {
+        throw boom.badRequest('Id is malformed');
+      }
+
+      throw error;
+    }
+
+  })
+);
+
 app.delete('/api/v1/records/:id',
   handleAsyncErrors(async (req, res) => {
     const id = req.params.id;
