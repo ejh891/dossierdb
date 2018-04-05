@@ -34,7 +34,7 @@ Database.connect();
 app.post('/api/v1/persons',
   handleAsyncErrors(async (req, res) => {
     const person = req.body.data.person;
-
+    
     const createdPerson = await PersonCollection.add(person);
 
     res.status(201); // created
@@ -50,7 +50,9 @@ app.post('/api/v1/persons',
 app.get('/api/v1/persons',
   // addCacheHeaders(moment.duration({ days: 1 }).asSeconds()),
   handleAsyncErrors(async (req, res) => {
-    const persons = await PersonCollection.browse();
+    const options = req.query;
+    
+    const persons = await PersonCollection.browse(options);
 
     res.json({
       data: {

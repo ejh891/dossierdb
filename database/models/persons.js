@@ -9,6 +9,11 @@ const PersonSchema = new mongoose.Schema({
     profilePhotoURL: {
         type: String,
         default: ""
+    },
+    userId: {
+        type: String,
+        required: true,
+        index: true,
     }
 });
 

@@ -2,8 +2,16 @@ const PersonModel = require('../models/persons');
 const RecordCollection = require('./recordCollection');
 
 class PersonCollection {
-  static async browse() {
-    const persons = await PersonModel.find({}).lean();
+  static async browse(options) {
+    const {
+      userId
+    } = options;
+
+    if (!userId) {
+      throw new Error('UserId is a required parameter');
+    }
+
+    const persons = await PersonModel.find({userId}).lean();
 
     const asyncPopulates = [];
     for (const person of persons) {
